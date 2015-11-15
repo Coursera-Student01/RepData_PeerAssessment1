@@ -270,7 +270,7 @@ In order to facilitate the comparison a single plot could be used.
 plot(weekdays$interval, 
      weekdays$mean.steps, 
      type = "l", col = "red", ylab = "Average steps", xlab = "Time of day", 
-     main = "Fig.4: Comparison of mean numer of steps per 5-minute interval \n 
+     main = "Fig.5: Comparison of mean numer of steps per 5-minute interval \n 
             for weekdays and weekends", xaxt = "n")
 axis(side = 1, 
      labels = c("00:00", "05:00", "10:00", "15:00", "20:00", "23:59"),
