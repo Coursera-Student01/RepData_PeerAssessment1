@@ -239,7 +239,31 @@ weekdays <- subset(weekdays_activity_pattern, weekdays_activity_pattern$Wday == 
 weekends <- subset(weekdays_activity_pattern, weekdays_activity_pattern$Wday == "Weekend")
 ```
 
-In order to make a comparison a plot should be drawn.
+The panel plot to compare the activity between weekdays.
+
+
+```r
+par <- par(mfrow = c(2, 1))
+plot(weekdays$interval, 
+     weekdays$mean.steps, 
+     type = "l", col = "red", ylab = "Average steps", xlab = "Time of day", 
+     main = "Fig.4a: Average number of steps during weekdays", xaxt = "n")
+axis(side = 1, 
+     labels = c("00:00", "05:00", "10:00", "15:00", "20:00", "23:59"),
+     at = c(0, 500, 1000, 1500, 2000, 2399))
+
+plot(weekends$interval, 
+     weekends$mean.steps, 
+     type = "l", col = "blue", ylab = "Average steps", xlab = "Time of day", 
+     main = "Fig.4b: Average number of steps during weekends", xaxt = "n")
+axis(side = 1, 
+     labels = c("00:00", "05:00", "10:00", "15:00", "20:00", "23:59"),
+     at = c(0, 500, 1000, 1500, 2000, 2399))
+```
+
+![plot of chunk Fig.4-Panel plot](figure/Fig.4-Panel plot-1.png) 
+
+In order to facilitate the comparison a single plot could be used.
 
 
 ```r
@@ -260,5 +284,5 @@ legend(x = 1500, y = 230,
        lwd = c(1, 1))
 ```
 
-![plot of chunk Fig.4-Comparison](figure/Fig.4-Comparison-1.png) 
-knit("PA1_template.Rmd")
+![plot of chunk Fig.5-Comparison in one plot](figure/Fig.5-Comparison in one plot-1.png) 
+
