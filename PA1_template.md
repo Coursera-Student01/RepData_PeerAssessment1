@@ -4,13 +4,7 @@ author: "Alexey Agarkov"
 date: "15 November 2015 ã."
 output: html_document
 ---
-```{r, echo = F, warning = F, message = F, results = 'hide'}
-library(dplyr)
-library(magrittr)
-library(knitr)
-library(markdown)
-Sys.setlocale("LC_ALL","English")
-```
+
 
 ##Introduction
 It is now possible to collect a large amount of data about personal movement using activity monitoring devices such as a Fitbit, Nike Fuelband, or Jawbone Up. These type of devices are part of the "quantified self" movement -- a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. But these data remain under-utilized both because the raw data are hard to obtain and there is a lack of statistical methods and software for processing and interpreting the data.
@@ -38,7 +32,8 @@ Getting the data includes:
 * extracting .csv from a .zip archive;
 * and reading it into current workspace.
 
-```{r echo=T}
+
+```r
 temp <- tempfile()
 download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip",
               temp)
@@ -61,7 +56,8 @@ Processing involves:
 * summarizing number of steps taken per day;
 * subsetting the available data.
 
-```{r echo=T, warning=FALSE}
+
+```r
 #Processing data
 daily_steps <- table_raw
 daily_steps$steps <- as.numeric(daily_steps$steps)
@@ -77,7 +73,8 @@ So now the data is ready for further analysis.
 
 First chunk of code produces a histogram, which roughly estimates the frequency distribution of number of steps taken per day.
 Here's the code for the histogram.
-```{r Fig.1-Histogram, echo=T}
+
+```r
 hist(daily_steps$Total.steps, 
      main = "Fig.1: Histogram of total number of steps per day",
      xlab = "Steps",
@@ -85,25 +82,30 @@ hist(daily_steps$Total.steps,
      las=1)
 ```
 
+![plot of chunk Fig.1-Histogram](figure/Fig.1-Histogram-1.png) 
+
 Now it's time to calculate the mean and median of the total number of steps taken per day.
 The code is as follows.
-```{r echo=T}
+
+```r
 mean_steps <- round(mean(daily_steps$Total.steps), digits = 2)
 median_steps <- round(median(daily_steps$Total.steps), digits = 2)
-
 ```
 
 So the mean of the total number of steps taken per day is:
-```{r echo=FALSE}
-cat(mean_steps)
+
+```
+## 10766.19
 ```
 And the median is: 
-```{r echo=FALSE}
-cat(median_steps)
+
+```
+## 10765
 ```
 ##Part 2: What is the average daily activity pattern?
 Proccessing for this step involves groupping by 5-minute interval across all dates.
-```{r echo=T, warning=FALSE}
+
+```r
 #Processing data
 activity_pattern <- table_raw
 activity_pattern$steps <- as.numeric(activity_pattern$steps)
@@ -115,7 +117,8 @@ activity_pattern <- activity_pattern %>%
 ```
 
 Once the data has been prepared, a time series plot of the 5-minute intervals (across x-axis) and the average number of steps taken, averaged across all days (y-axis) can be constructed.
-```{r Fig.2-Plot average steps, echo=T }
+
+```r
 plot(activity_pattern$interval, activity_pattern$mean.steps, type = "l", 
     main = "Fig.2: Average steps per 5-minute interval", 
     ylab = "Average steps", xlab = "Time of day", xaxt = "n")
@@ -128,23 +131,28 @@ text(835 + 0.9, max(activity_pattern$mean.steps)-15, "The highest average number
 symbols(835, max(activity_pattern$mean.steps), circles=25, inches=FALSE, add=TRUE, lwd=2)
 ```
 
+![plot of chunk Fig.2-Plot average steps](figure/Fig.2-Plot average steps-1.png) 
+
 Now it's time to find the interval with the highest average number of steps.
-```{r echo=T}
+
+```r
 max_average_steps <- max(activity_pattern$mean.steps)
 max_interval <- activity_pattern$interval[activity_pattern$mean.steps == max_average_steps]
 ```
 
-Since the interval has a value of `r max_interval`, it means that the highest average number of steps is taken between 8:35 AM and 8:40 AM.
+Since the interval has a value of 835, it means that the highest average number of steps is taken between 8:35 AM and 8:40 AM.
 
 ##Part 3: Imputing missing values
 Here's a line of code which calculates missing values:
-```{r echo=T, warning=F}
+
+```r
 NA_count <- sum(is.na(as.numeric(table_raw$steps)))
 ```
-There are `r NA_count` missing values.
+There are 2304 missing values.
 
 As a strategy for filling missing values I would like to impute missing data points with mean values of corresponding 5-minute interval. Since the mean for every interval has already been calculated in previous part and is available in **activity_pattern** data frame it seems reasonable to use it. The code creates a new **table** data frame and matches NA data points by intervals with **activity_pattern** data frame.
-```{r echo=T, warning=F}
+
+```r
 table <- table_raw
 table$steps <- as.numeric(table$steps)
 table$steps[is.na(table$steps)] <- activity_pattern$mean.steps[
@@ -156,7 +164,8 @@ Operations in the next step will be similar to part 1:
 * dataset is grouping by days;
 * number of steps taken per day is calculated.
 
-```{r echo=T}
+
+```r
 daily_steps_imp <- table %>%
   select(date, steps) %>%
   group_by(date) %>%
@@ -164,7 +173,8 @@ daily_steps_imp <- table %>%
 ```
 
 And here's a histogram.
-```{r Fig.3-Histogram(missing values imputed), echo=T}
+
+```r
 hist(daily_steps_imp$Total.steps, 
      main = "Fig.3: Histogram of total number of steps per day \n (missing values imputed)",
      xlab = "Steps",
@@ -172,27 +182,32 @@ hist(daily_steps_imp$Total.steps,
      las=1)
 ```
 
+![plot of chunk Fig.3-Histogram(missing values imputed)](figure/Fig.3-Histogram(missing values imputed)-1.png) 
+
 Mean and median calculations for updated data.
-```{r echo=T}
+
+```r
 mean_steps_imp <- round(mean(daily_steps_imp$Total.steps), digits = 2)
 median_steps_imp <- round(median(daily_steps_imp$Total.steps), digits = 2)
-
 ```
 
 The mean of the total number of steps taken per day for updated data is:
-```{r echo=FALSE}
-cat(mean_steps_imp)
+
+```
+## 10766.19
 ```
 Since the data has been updated with means a new median is equal to mean: 
-```{r echo=FALSE}
-cat(median_steps_imp)
+
+```
+## 10766.19
 ```
 The strategy used for imputing missing data had no significatng impact on the steps per day frequency distribution, mean and median.
 
 
 ##Part 4: Are there differences in activity patterns between weekdays and weekends?
 For this part of assignment a dataset must be updated with variable, indicating a day of the week, which will help to distinguish between weekends and weekdays.
-```{r echo=T}
+
+```r
 table_weekdays <- table
 table_weekdays$date <- strptime(table_weekdays$date, format = "%Y-%m-%d")
 table_weekdays$Wday <- weekdays(table_weekdays$date)
@@ -213,7 +228,8 @@ table_weekdays$Wday <- gsub("Sunday", "Weekend",
 ```
 After the weekday variable has been defined, it's time for further processing. Activity patterns for weekday/weekend should be worked out, similarly to part 2.
 
-```{r echo=T}
+
+```r
 weekdays_activity_pattern <- table_weekdays %>%
   select(Wday, interval, steps) %>%
   group_by(Wday, interval) %>%
@@ -225,7 +241,8 @@ weekends <- subset(weekdays_activity_pattern, weekdays_activity_pattern$Wday == 
 
 In order to make a comparison a plot should be drawn.
 
-```{r Fig.4-Comparison, echo=T, }
+
+```r
 plot(weekdays$interval, 
      weekdays$mean.steps, 
      type = "l", col = "red", ylab = "Average steps", xlab = "Time of day", 
@@ -242,4 +259,6 @@ legend(x = 1500, y = 230,
        lty = c(1, 1),
        lwd = c(1, 1))
 ```
+
+![plot of chunk Fig.4-Comparison](figure/Fig.4-Comparison-1.png) 
 knit("PA1_template.Rmd")
